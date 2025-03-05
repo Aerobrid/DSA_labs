@@ -12,6 +12,10 @@ typedef struct {
 
 MyQueue* myQueueCreate() {
     MyQueue* queue = (MyQueue*)malloc(sizeof(MyQueue));                             // allocate memory in the heap for new Queue struct
+    if(!queue){
+        printf("Memory Allocation Error");
+        return NULL;
+    }
     queue->capacity = 100;                                                          // Set an initial size/capacity for queue
     queue->inStack = (int*)malloc(queue->capacity * sizeof(int));                   // Explain rest of function
     queue->outStack = (int*)malloc(queue->capacity * sizeof(int));
@@ -20,11 +24,24 @@ MyQueue* myQueueCreate() {
     return queue;
 }
 
-void myQueuePush(MyQueue* obj, int x) {
-    obj->inStack[++obj->inTop] = x;                                                 // Given pointer to Queue struct, add to instack array
+void myQueuePush(MyQueue* obj, int x) {                                             // Given pointer to Queue struct, add to instack array
+    if (obj->inTop + 1 >= obj->capacity) {                                          // To avoid out of bounds with capacity variable
+        printf("Queue is full!\n");
+        return;
+    }
+    obj->inStack[++obj->inTop] = x;
 }
 
+
+bool myQueueEmpty(MyQueue* obj) {
+    return obj->inTop == -1 && obj->outTop == -1;                                   // Given pointer to Queue struct, 
+}                                                                                   // return a bool saying if both stacks are empty or not
+
 int myQueuePop(MyQueue* obj) {
+    if (myQueueEmpty(obj)) {                                                        // In case no elements within both stacks in queue
+        printf("Queue is empty, cannot pop.\n");    
+        return -1;  
+    }
     if (obj->outTop == -1) {                                                        // If the outStack is empty, transfer all elements from instack array
         while (obj->inTop >= 0) {                                                   // Explain rest
             obj->outStack[++obj->outTop] = obj->inStack[obj->inTop--];
@@ -34,6 +51,10 @@ int myQueuePop(MyQueue* obj) {
 }
 
 int myQueuePeek(MyQueue* obj) {
+    if (myQueueEmpty(obj)) {                                                        // In case no elements within both stacks in queue
+        printf("Queue is empty, cannot pop.\n");
+        return -1;  
+    }
     if (obj->outTop == -1) {                                                        // Transfer elements if outStack is empty IF ANY
         while (obj->inTop >= 0) {                                                   // Explain rest
             obj->outStack[++obj->outTop] = obj->inStack[obj->inTop--];
@@ -41,10 +62,6 @@ int myQueuePeek(MyQueue* obj) {
     }
     return obj->outStack[obj->outTop];                                              // return a peek at the top of outStack
 }
-
-bool myQueueEmpty(MyQueue* obj) {
-    return obj->inTop == -1 && obj->outTop == -1;                                   // Given pointer to Queue struct, 
-}                                                                                   // return a bool saying if both stacks are empty or not
 
 void myQueueFree(MyQueue* obj) {                                                    // free function FREES:
     free(obj->inStack);                                                             // 1. instack from Queue struct (we used malloc)
@@ -82,6 +99,8 @@ int main(){
     printf("%d popped from Queue\n", pop_2);
     int pop_3 = myQueuePop(obj);
     printf("%d popped from Queue\n", pop_3);
+    int pop_4 = myQueuePop(obj);
+    printf("%d popped from Queue\n", pop_4);
   
     int peek = myQueuePeek(obj);
     printf("%d is at the front of queue\n", peek);
