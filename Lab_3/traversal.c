@@ -98,7 +98,7 @@ void FreeNode(struct TreeNode* root){
     free(root);
 }
 
-// create tree in main, perform traversals, then free it
+// create binary tree in main, perform traversals, then free it
 int main() {
     struct TreeNode* root = Node(8);
     root->left = Node(3);
